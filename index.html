@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>Homework 1</title>
+		<meta charset="utf-8">
+		
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+		<script src="three.min.js"></script>
+		<script src="stats.min.js"></script>
+		<script src="vax.js"></script>
+		<script src="TeapotGeometry.js"></script>
+	</head>
+	
+	<body>
+		<script>
+			vaxInit();
+			scene.background= new THREE.Color('#251B24');
+						
+			var material = new THREE.MeshPhongMaterial({
+				color: "#564D63", 
+				shininess: 100
+			});
+
+			var laptop = new THREE.Group();
+			
+			//долна част------------------------------------------
+			var base = new THREE.Group();
+								
+			var base1 = new THREE.Mesh( new THREE.BoxGeometry( 30, 0.5, 20 ), material );
+			var base2 = new THREE.Mesh( new THREE.BoxGeometry( 2, 0.5, 28 ), material );
+				base2.rotation.y = Math.PI/2;
+				base2.position.set(0,0,10);
+			var base3 = new THREE.Mesh( new THREE.CylinderGeometry( 1, 1, 0.5, 32 ), material );
+				base3.position.set( -14, 0, 10 );
+			var base4 = new THREE.Mesh( new THREE.CylinderGeometry( 1, 1, 0.5, 32 ), material );
+				base4.position.set( 14, 0, 10 );
+			base.add(base1,base2,base3,base4);
+			
+			//горна част------------------------------------------
+			var topbase = new THREE.Group();
+				topbase=base.clone(true);				
+				topbase.position.set(0,10.5,-10.5);
+				topbase.rotation.set(3*Math.PI/2,0,0);
+				
+			
+			//връзка между двете части------------------------------------------
+			var connector = new THREE.Mesh(new THREE.CylinderGeometry( 0.7, 0.7, 30, 32 ),material)
+			connector.position.set(0,0,-10.5);
+			connector.rotation.set(Math.PI/2,0,Math.PI/2);
+						
+			
+			//екран------------------------------------------
+			var screen = new THREE.Mesh(new THREE.PlaneGeometry( 29, 19 ),  new THREE.MeshPhongMaterial( {
+				color: "white",
+				side: THREE.FrontSide, shininess:10,
+				emissive: new THREE.Color().setHSL( 0.5, 0.5, 0.7 ),
+				emissiveIntensity: 1 }));	
+			screen.rotation.set(Math.PI/2,0,0);
+			screen.position.set(0,-0.26,0);
+			
+			var frontcamera =  new THREE.Mesh(new THREE.CylinderGeometry( 0.3,0.3, 0.2, 32 ),new THREE.MeshPhongMaterial({
+				color: "white", 
+				shininess: 100 }));
+				frontcamera.position.set(0,-0.26,10);
+			
+			
+			topbase.add(screen, frontcamera);
+			
+			//светлина------------------------------------------
+			renderer.shadowMap.enabled = true;
+			light.target = new THREE.Object3D();
+			scene.add( light.target );
+			light.castShadow = true;
+			laptop.receiveShadow = true;	
+			
+			//клавиатура и тъчпад------------------------------------------
+			var keyboard1 = new THREE.Mesh(new THREE.BoxGeometry( 19, 12,0.2 ),  new THREE.MeshLambertMaterial( {color: "#797382"}));
+				keyboard1.rotation.set(Math.PI/2,0,0);
+				keyboard1.position.set(-4,0.26,-2);
+			var keyboard2 = new THREE.Mesh(new THREE.BoxGeometry( 6, 12,0.2 ),  new THREE.MeshLambertMaterial( {color: "#797382"} ));
+				keyboard2.rotation.set(Math.PI/2,0,0);
+				keyboard2.position.set(10,0.26,-2);	
+			var touchpad = new THREE.Mesh(new THREE.PlaneGeometry( 8, 5 ),  new THREE.MeshPhongMaterial( {color: "#7C7883", side: THREE.DoubleSide} ));
+				touchpad.rotation.set(Math.PI/2,0,0);
+				touchpad.position.set(-4,0.26,7);
+			base.add(keyboard1,keyboard2,touchpad);	
+			
+			var flash1 = new THREE.Mesh( new THREE.BoxGeometry( 0.7, 0.2, 0.5 ),  new THREE.MeshLambertMaterial( {color: "yellow", side: THREE.DoubleSide} ));
+				flash1.position.set(15,0,-8);
+			
+			//обединяваме всичко------------------------------------------
+			laptop.add(base,topbase,connector);
+			laptop.position.set(0,-20,0);
+			laptop.scale.set(2,1.8,2);
+			scene.add(laptop);
+
+			//подсветка на клавиатурата-----------------------------------
+			var redLight = new THREE.PointLight( 'red', 5, 30 );
+				redLight.position.set( -10, 0, 8 );
+			
+			var blueLight = new THREE.PointLight( 'blue', 5, 30);
+				blueLight.position.set( 10, 0, 8 );
+			
+			
+			laptop.add( redLight,blueLight,flash1 );	
+			
+			function animate(t)
+			{
+				laptop.position.set(0,-20,15*Math.cos(t));
+				laptop.rotation.set(0, t, 0);
+			}
+		</script>
+	</body>
+</html>
